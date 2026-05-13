@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Captain's Log — USS Enterprise</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --gold: #f0c040;
+    --lcars-orange: #ff9900;
+    --lcars-blue: #9999ff;
+    --lcars-red: #cc4444;
+    --bg: #0a0a0f;
+    --panel: #0f0f1a;
+    --border: #1a1a3a;
+    --text: #c8d8e8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+  }
+
+  .lcars-header {
+    background: var(--panel);
+    border-bottom: 3px solid var(--gold);
+    padding: 0;
+    display: flex;
+    align-items: stretch;
+  }
+  .lcars-elbow {
+    width: 180px;
+    background: var(--gold);
+    border-radius: 0 0 40px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    flex-shrink: 0;
+  }
+  .lcars-elbow span {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    color: #000;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .lcars-title-area {
+    flex: 1;
+    padding: 15px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .lcars-title-area h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 28px;
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+  .lcars-title-area .subtitle {
+    color: var(--lcars-blue);
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin-top: 4px;
+  }
+  .lcars-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 15px 20px;
+    justify-content: center;
+  }
+  .lcars-bar { height: 12px; border-radius: 6px; }
+
+  .stardate-display {
+    background: #000;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 8px 20px;
+    margin: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    align-self: center;
+  }
+  .stardate-display .label { color: var(--lcars-orange); font-size: 10px; letter-spacing: 2px; }
+  .stardate-display .value { color: var(--gold); font-size: 22px; font-family: 'Orbitron', sans-serif; }
+
+  .main { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    border-radius: 4px;
+    margin-bottom: 30px;
+    overflow: hidden;
+  }
+  .panel-header {
+    background: var(--gold);
+    color: #000;
+    padding: 8px 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    font-weight: 700;
+  }
+  .panel-body { padding: 25px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label { font-size: 10px; letter-spacing: 2px; color: var(--lcars-orange); text-transform: uppercase; }
+  input, textarea {
+    background: #000;
+    border: 1px solid #2a2a4a;
+    border-radius: 3px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus { border-color: var(--gold); }
+  textarea { resize: vertical; min-height: 120px; }
+
+  .file-upload-area {
+    border: 2px dashed #2a2a4a;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .file-upload-area:hover { border-color: var(--gold); }
+  .file-upload-area input { display: none; }
+  .file-upload-area .icon { font-size: 24px; margin-bottom: 8px; }
+  .file-upload-area p { font-size: 12px; color: #666; }
+  .file-name { color: var(--lcars-blue); font-size: 12px; margin-top: 6px; }
+
+  .btn {
+    background: var(--gold);
+    color: #000;
+    border: none;
+    border-radius: 20px;
+    padding: 12px 30px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .btn:hover { background: #ffd060; transform: translateY(-1px); }
+  .btn-danger {
+    background: var(--lcars-red);
+    color: #fff;
+    padding: 6px 14px;
+    font-size: 10px;
+    border-radius: 3px;
+    border: none;
+    font-family: 'Orbitron', sans-serif;
+    cursor: pointer;
+  }
+  .btn-danger:hover { background: #ff6666; }
+
+  .logs-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+  .logs-header h2 { font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 3px; color: var(--lcars-blue); }
+  .log-count { background: var(--lcars-blue); color: #000; border-radius: 10px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+
+  .log-entry {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--lcars-blue);
+    border-radius: 4px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: border-left-color 0.2s;
+  }
+  .log-entry:hover { border-left-color: var(--gold); }
+  .log-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: rgba(153,153,255,0.05);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .log-meta { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .log-stardate { font-family: 'Orbitron', sans-serif; color: var(--gold); font-size: 14px; }
+  .log-stardate span { font-size: 10px; color: #666; margin-right: 5px; letter-spacing: 1px; }
+  .log-location { color: var(--lcars-orange); font-size: 11px; letter-spacing: 1px; }
+  .log-date { color: #444; font-size: 11px; }
+  .log-title { padding: 15px 20px 5px; font-family: 'Orbitron', sans-serif; font-size: 16px; color: #fff; letter-spacing: 1px; }
+  .log-body { padding: 10px 20px 20px; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
+  .log-attachment { margin: 0 20px 20px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; max-width: 400px; }
+  .log-attachment img { width: 100%; display: block; }
+  .log-attachment a { display: block; padding: 10px 15px; color: var(--lcars-blue); text-decoration: none; font-size: 12px; }
+  .log-attachment a:hover { color: var(--gold); }
+
+  .scanline {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    z-index: 9999;
+  }
+  .empty-state { text-align: center; padding: 60px 20px; color: #333; }
+  .empty-state .icon { font-size: 48px; margin-bottom: 15px; }
+  .empty-state p { font-size: 13px; letter-spacing: 2px; }
+
+  .toast {
+    position: fixed; bottom: 30px; right: 30px;
+    background: var(--gold); color: #000;
+    padding: 12px 24px; border-radius: 4px;
+    font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px;
+    opacity: 0; transform: translateY(20px); transition: all 0.3s; z-index: 10000;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<header class="lcars-header">
+  <div class="lcars-elbow"><span>STAR FLEET COMMAND</span></div>
+  <div class="lcars-title-area">
+    <h1>Captain's Log</h1>
+    <div class="subtitle">USS Enterprise — NCC-1701-D — Personal Record Archive</div>
+  </div>
+  <div class="stardate-display">
+    <div>
+      <div class="label">Stardate</div>
+      <div class="value" id="stardate">---</div>
+    </div>
+  </div>
+  <div class="lcars-bars">
+    <div class="lcars-bar" style="width:80px;background:#ff9900"></div>
+    <div class="lcars-bar" style="width:50px;background:#cc4444"></div>
+    <div class="lcars-bar" style="width:65px;background:#9999ff"></div>
+    <div class="lcars-bar" style="width:40px;background:#f0c040"></div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="panel">
+    <div class="panel-header">— New Log Entry —</div>
+    <div class="panel-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Stardate</label>
+          <input type="text" id="input-stardate" readonly/>
+        </div>
+        <div class="form-group">
+          <label>Location / Sector</label>
+          <input type="text" id="input-location" placeholder="e.g. Neutral Zone, Sector 001"/>
+        </div>
+        <div class="form-group full">
+          <label>Log Title</label>
+          <input type="text" id="input-title" placeholder="e.g. First Contact with Species 8472"/>
+        </div>
+        <div class="form-group full">
+          <label>Log Entry</label>
+          <textarea id="input-entry" placeholder="Captain's log, stardate..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Attachment (Image / File)</label>
+          <div class="file-upload-area" onclick="document.getElementById('input-file').click()">
+            <input type="file" id="input-file" accept="image/*,.pdf,.mp4" onchange="updateFileName(this)"/>
+            <div class="icon">📎</div>
+            <p>Click to attach a file — images, PDFs, video (max 20MB)</p>
+            <div class="file-name" id="file-name"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn" onclick="submitLog()">⚡ Commit to Record</button>
+    </div>
+  </div>
+
+  <div class="logs-header">
+    <h2>// Log Archive</h2>
+    <span class="log-count" id="log-count">0</span>
+  </div>
+  <div id="logs-container">
+    <div class="empty-state">
+      <div class="icon">🖖</div>
+      <p>No log entries on record. Begin your first entry above.</p>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  async function loadStardate() {
+    const r = await fetch('/api/stardate');
+    const d = await r.json();
+    document.getElementById('stardate').textContent = d.stardate;
+    document.getElementById('input-stardate').value = d.stardate;
+  }
+
+  function updateFileName(input) {
+    document.getElementById('file-name').textContent = input.files[0]?.name || '';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  async function submitLog() {
+    const stardate = document.getElementById('input-stardate').value.trim();
+    const title = document.getElementById('input-title').value.trim();
+    const entry = document.getElementById('input-entry').value.trim();
+    const location = document.getElementById('input-location').value.trim();
+    const file = document.getElementById('input-file').files[0];
+
+    if (!title || !entry) return showToast('Title and entry are required.');
+
+    const fd = new FormData();
+    fd.append('stardate', stardate);
+    fd.append('title', title);
+    fd.append('entry', entry);
+    fd.append('location', location);
+    if (file) fd.append('attachment', file);
+
+    const r = await fetch('/api/logs', { method: 'POST', body: fd });
+    if (r.ok) {
+      document.getElementById('input-title').value = '';
+      document.getElementById('input-entry').value = '';
+      document.getElementById('input-location').value = '';
+      document.getElementById('input-file').value = '';
+      document.getElementById('file-name').textContent = '';
+      showToast('Log entry committed to record.');
+      loadLogs();
+    } else {
+      showToast('Error saving log entry.');
+    }
+  }
+
+  async function deleteLog(id) {
+    if (!confirm('Delete this log entry? This cannot be undone.')) return;
+    const r = await fetch(`/api/logs/${id}`, { method: 'DELETE' });
+    if (r.ok) { showToast('Log entry deleted.'); loadLogs(); }
+  }
+
+  function formatDate(iso) {
+    return new Date(iso).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+
+  function renderAttachment(att) {
+    if (!att) return '';
+    const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(att);
+    if (isImg) return `<div class="log-attachment"><img src="${att}" alt="attachment"/></div>`;
+    return `<div class="log-attachment"><a href="${att}" target="_blank">📎 View Attachment</a></div>`;
+  }
+
+  async function loadLogs() {
+    const r = await fetch('/api/logs');
+    const logs = await r.json();
+    const c = document.getElementById('logs-container');
+    document.getElementById('log-count').textContent = logs.length;
+    if (!logs.length) {
+      c.innerHTML = `<div class="empty-state"><div class="icon">🖖</div><p>No log entries on record. Begin your first entry above.</p></div>`;
+      return;
+    }
+    c.innerHTML = logs.map(l => `
+      <div class="log-entry">
+        <div class="log-entry-header">
+          <div class="log-meta">
+            <div class="log-stardate"><span>STARDATE</span>${l.stardate}</div>
+            <div class="log-location">📍 ${l.location}</div>
+            <div class="log-date">${formatDate(l.created_at)}</div>
+          </div>
+          <button class="btn-danger" onclick="deleteLog(${l.id})">Delete</button>
+        </div>
+        <div class="log-title">${l.title}</div>
+        <div class="log-body">${l.entry}</div>
+        ${renderAttachment(l.attachment)}
+      </div>
+    `).join('');
+  }
+
+  loadStardate();
+  loadLogs();
+</script>
+</body>
+</html>
